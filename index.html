@@ -469,7 +469,10 @@
   <div class="table-section" id="tableSection">
     <div class="section-header">
       <span class="section-title">Registros del día</span>
-      <button class="btn-export" id="btnExport">Exportar CSV</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-export" id="btnClear" style="color:#e85555;border-color:rgba(232,85,85,0.3);">Borrar todo</button>
+        <button class="btn-export" id="btnExport">Exportar CSV</button>
+      </div>
     </div>
     <div class="table-scroll">
       <table>
@@ -493,7 +496,7 @@
 <footer>Clínica de Albolote · Solo para uso interno</footer>
 
 <script>
-  let records = [];
+  let records = JSON.parse(localStorage.getItem('rabias_records') || '[]');
   let pendingRecord = null;
   let photo1 = null; // { base64, mediaType }
   let photo2 = null;
@@ -687,8 +690,19 @@ Si algún campo no es visible o legible en ninguna de las dos imágenes, usa "NO
   });
 
   document.getElementById('btnExport').addEventListener('click', exportCSV);
+  if (records.length > 0) renderTable();
+  document.getElementById('btnClear').addEventListener('click', () => {
+    if (confirm('¿Borrar todos los registros del día?')) {
+      records = [];
+      localStorage.removeItem('rabias_records');
+      tableBody.innerHTML = '';
+      counter.textContent = '0 reg.';
+      tableSection.classList.remove('visible');
+    }
+  });
 
   function renderTable() {
+    localStorage.setItem('rabias_records', JSON.stringify(records));
     counter.textContent = records.length + ' reg.';
     tableBody.innerHTML = '';
     records.forEach(r => {
