@@ -259,6 +259,53 @@
     flex: 1;
   }
   .result-value.highlight { color: var(--green); }
+  .result-row .result-input {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+    flex: 1;
+    word-break: break-all;
+  }
+  .result-row .result-input:focus {
+    background: rgba(232,112,26,0.08);
+    border-radius: 4px;
+    padding: 2px 4px;
+  }
+
+  /* DOUBLE ROW */
+  .result-row-double {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-half {
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .result-half:first-child {
+    border-right: 1px solid var(--border);
+  }
+  .result-input {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 0;
+  }
+  .result-input.highlight { color: var(--green); }
+  .result-input:focus {
+    background: rgba(232,112,26,0.08);
+    border-radius: 4px;
+    padding: 2px 4px;
+  }
 
   /* ACTIONS */
   .actions {
@@ -434,29 +481,31 @@
       <span>▸</span>
       <span id="resultNum">Registro #1</span>
     </div>
-    <div class="result-row">
-      <span class="result-label">Microchip</span>
-      <span class="result-value highlight" id="r-chip">—</span>
-    </div>
-    <div class="result-row">
-      <span class="result-label">Fecha</span>
-      <span class="result-value" id="r-fecha">—</span>
-    </div>
-    <div class="result-row">
-      <span class="result-label">Producto</span>
-      <span class="result-value" id="r-producto">—</span>
-    </div>
-    <div class="result-row">
-      <span class="result-label">Fabricante</span>
-      <span class="result-value" id="r-fabricante">—</span>
+    <div class="result-row-double">
+      <div class="result-half">
+        <span class="result-label">Microchip</span>
+        <input class="result-input highlight" id="r-chip" value="—">
+      </div>
+      <div class="result-half">
+        <span class="result-label">Sello 2026</span>
+        <input class="result-input highlight" id="r-sello" value="—">
+      </div>
     </div>
     <div class="result-row">
       <span class="result-label">Lote</span>
-      <span class="result-value" id="r-lote">—</span>
+      <input class="result-input" id="r-lote" value="—">
     </div>
     <div class="result-row">
-      <span class="result-label">Sello 2026</span>
-      <span class="result-value" id="r-sello">—</span>
+      <span class="result-label">Fecha</span>
+      <input class="result-input" id="r-fecha" value="—">
+    </div>
+    <div class="result-row">
+      <span class="result-label">Producto</span>
+      <input class="result-input" id="r-producto" value="—">
+    </div>
+    <div class="result-row">
+      <span class="result-label">Fabricante</span>
+      <input class="result-input" id="r-fabricante" value="—">
     </div>
   </div>
 
@@ -643,12 +692,12 @@ Si algún campo no es visible o legible en ninguna de las dos imágenes, usa "NO
       const isDuplicate = records.some(r => r.microchip === pendingRecord.microchip && pendingRecord.microchip !== 'NO VISIBLE');
 
       document.getElementById('resultNum').textContent = `Registro #${pendingRecord.num}`;
-      document.getElementById('r-chip').textContent = pendingRecord.microchip;
-      document.getElementById('r-fecha').textContent = pendingRecord.fecha;
-      document.getElementById('r-producto').textContent = pendingRecord.producto;
-      document.getElementById('r-fabricante').textContent = pendingRecord.fabricante;
-      document.getElementById('r-lote').textContent = pendingRecord.lote;
-      document.getElementById('r-sello').textContent = pendingRecord.sello;
+      document.getElementById('r-chip').value = pendingRecord.microchip;
+      document.getElementById('r-fecha').value = pendingRecord.fecha;
+      document.getElementById('r-producto').value = pendingRecord.producto;
+      document.getElementById('r-fabricante').value = pendingRecord.fabricante;
+      document.getElementById('r-lote').value = pendingRecord.lote;
+      document.getElementById('r-sello').value = pendingRecord.sello;
 
       resultCard.classList.add('visible');
       actions.classList.add('visible');
@@ -670,6 +719,13 @@ Si algún campo no es visible o legible en ninguna de las dos imágenes, usa "NO
 
   document.getElementById('btnConfirm').addEventListener('click', () => {
     if (!pendingRecord) return;
+    // Read possibly-edited values from inputs
+    pendingRecord.microchip = document.getElementById('r-chip').value;
+    pendingRecord.sello = document.getElementById('r-sello').value;
+    pendingRecord.lote = document.getElementById('r-lote').value;
+    pendingRecord.fecha = document.getElementById('r-fecha').value;
+    pendingRecord.producto = document.getElementById('r-producto').value;
+    pendingRecord.fabricante = document.getElementById('r-fabricante').value;
     records.push(pendingRecord);
     pendingRecord = null;
     renderTable();
