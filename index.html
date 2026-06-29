@@ -447,6 +447,12 @@
     <span class="step-label" id="stepLabel">Sube las 2 fotos del pasaporte</span>
   </div>
 
+  <!-- Location field -->
+  <div style="display:flex;align-items:center;gap:10px;background:#162330;border:1px solid #2a4055;border-radius:8px;padding:10px 14px;">
+    <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7a9ab5;white-space:nowrap;">Lugar</span>
+    <input id="inputLugar" type="text" placeholder="Alb, Mj, Gh..." style="background:transparent;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:14px;color:#e8edf2;width:100%;">
+  </div>
+
   <!-- Two photo slots -->
   <div class="photo-slots">
     <div class="photo-slot" id="slot1">
@@ -528,6 +534,7 @@
         <thead>
           <tr>
             <th>#</th>
+            <th>Lugar</th>
             <th>Microchip</th>
             <th>Sello 2026</th>
             <th>Lote</th>
@@ -681,6 +688,7 @@ Si algún campo no es visible o legible en ninguna de las dos imágenes, usa "NO
 
       pendingRecord = {
         num: records.length + 1,
+        lugar: document.getElementById('inputLugar').value.trim() || '—',
         microchip: parsed.microchip || 'NO VISIBLE',
         fecha: parsed.fecha || 'NO VISIBLE',
         producto: parsed.producto || 'NO VISIBLE',
@@ -691,7 +699,7 @@ Si algún campo no es visible o legible en ninguna de las dos imágenes, usa "NO
 
       const isDuplicate = records.some(r => r.microchip === pendingRecord.microchip && pendingRecord.microchip !== 'NO VISIBLE');
 
-      document.getElementById('resultNum').textContent = `Registro #${pendingRecord.num}`;
+      document.getElementById('resultNum').textContent = `Registro #${pendingRecord.num}${pendingRecord.lugar !== "—" ? " · " + pendingRecord.lugar : ""}`;
       document.getElementById('r-chip').value = pendingRecord.microchip;
       document.getElementById('r-fecha').value = pendingRecord.fecha;
       document.getElementById('r-producto').value = pendingRecord.producto;
@@ -758,6 +766,7 @@ Si algún campo no es visible o legible en ninguna de las dos imágenes, usa "NO
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${r.num}</td>
+        <td>${r.lugar || "—"}</td>
         <td class="cell-chip">${r.microchip}</td>
         <td>${r.sello}</td>
         <td>${r.lote}</td>
@@ -772,6 +781,7 @@ Si algún campo no es visible o legible en ninguna de las dos imágenes, usa "NO
 
   function resetUI() {
     photo1 = null; photo2 = null;
+    document.getElementById('inputLugar').value = '';
     file1.value = ''; file2.value = '';
     thumb1.style.display = 'none'; thumb2.style.display = 'none';
     slot1.classList.remove('filled'); slot2.classList.remove('filled');
@@ -815,8 +825,8 @@ Si algún campo no es visible o legible en ninguna de las dos imágenes, usa "NO
 
   function exportCSV() {
     if (!records.length) return;
-    const header = ['#', 'Microchip', 'Sello 2026', 'Lote', 'Fecha', 'Producto', 'Fabricante'];
-    const rows = records.map(r => [r.num, r.microchip, r.sello, r.lote, r.fecha, r.producto, r.fabricante]);
+    const header = ['#', 'Lugar', 'Microchip', 'Sello 2026', 'Lote', 'Fecha', 'Producto', 'Fabricante'];
+    const rows = records.map(r => [r.num, r.lugar || '—', r.microchip, r.sello, r.lote, r.fecha, r.producto, r.fabricante]);
     const csv = [header, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
